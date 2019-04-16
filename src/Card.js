@@ -25,20 +25,14 @@ const RightArrow = styled.div`
     padding-right: 8px;
 `;
 
-class Card extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
-    render() {
-        return (
-            <CardContainer>
-                <LeftArrow onClick={() => this.props.moveLeft}>{this.props.left ? '' : '<'}</LeftArrow>
-                {this.props.content}
-                <RightArrow onClick={() => this.props.moveRight}>{this.props.right ? '' : '>'}</RightArrow>
-            </CardContainer>
-        )
-    }
+const Card = (props) => {
+    return (
+        <CardContainer>
+            <LeftArrow onClick={() => props.moveLeft(props.columnIndex, props.data.key)}>{props.columnIndex === 0 ? '' : '<'}</LeftArrow>
+            {props.data.content}
+            <RightArrow onClick={() => props.moveRight(props.columnIndex, props.data.key)}>{props.columnIndex === 3 ? '' : '>'}</RightArrow>
+        </CardContainer>
+    )
 }
 
 export default Card;

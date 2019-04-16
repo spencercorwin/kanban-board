@@ -5,8 +5,8 @@ import Card from './Card';
 const ColumnContainer = styled.div`
     width: 100%;
     background-color: none;
-    margin-left: ${props => props.left ? 0 : '12.5px'};
-    margin-right: ${props => props.right ? 0 : '12.5px'};
+    margin-left: ${props => props.columnIndex === 0 ? 0 : '12.5px'};
+    margin-right: ${props => props.columnIndex === 3 ? 0 : '12.5px'};
 `;
 
 const TitleContainer = styled.h2`
@@ -16,40 +16,28 @@ const TitleContainer = styled.h2`
     height: 30px;
     margin-top: 0;
     margin-bottom: 12px;
-    background-color: ${props => {
-        if (props.title === 'Winnie') {
-            return '#8E6E95';
-        } else if (props.title === 'Bob') {
-            return '#39A59C';
-        } else if (props.title === 'Thomas') {
-            return '#344759';
-        } else if (props.title === 'George') {
-            return '#E8741E';
-        }
-    }}
+    background-color: ${props => props.color};
 `;
 
+const AddButton = styled.p`
+    cursor: pointer;
+`;
 
-class Column extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
-    render() {
-        const cards = this.props.cards.map(e => <Card 
-            moveLeft={this.props.moveLeft}
-            moveRight={this.props.moveRight}
-            left={this.props.title === 'Winnie' ? true : false}
-            right={this.props.title === 'George' ? true : false} content={e}/>)
-        return (
-            <ColumnContainer left={this.props.title === 'Winnie' ? true : false}
-                             right={this.props.title === 'George' ? true : false}>
-                <TitleContainer title={this.props.title}>{this.props.title}</TitleContainer>
-                {cards}
-                <p onClick={() => this.props.add(this.props.title)}>+ Add a card</p>
-            </ColumnContainer>
-        )
-    }
+const Column = (props) => {
+    const cards = props.data.cards.map(e => <Card 
+                                            moveLeft={props.moveLeft}
+                                            moveRight={props.moveRight}
+                                            columnIndex={props.index}
+                                            data={e}
+                                            key={e.key}
+                                        />)
+    return (
+        <ColumnContainer columnIndex={props.index}>
+            <TitleContainer color={props.data.color}>{props.data.title}</TitleContainer>
+            {cards}
+            <AddButton onClick={() => props.add(props.index)}>+ Add a card</AddButton>
+        </ColumnContainer>
+    )
 }
 
 export default Column;

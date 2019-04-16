@@ -17,79 +17,138 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      Winnie: [
-        'Col 1',
-        'Col 1',
-      ],
-      Bob: [
-        'Col 2',
-        'Col 2',
-      ],
-      Thomas: [
-        'Col 3',
-        'Col 3',
-      ],
-      George: [
-        'Col 4',
-        'Col 4',
+      columns: [
+        {
+          title: 'Winnie',
+          color: '#8E6E95',
+          key: Math.random()*10000,
+          cards: [
+            {
+              content: 'Col 1',
+              key: Math.random()*10000,
+            },
+            {
+              content: 'Col 1',
+              key: Math.random()*10000,
+            },
+          ],
+        },
+        {
+          title: 'Bob',
+          color: '#39A59C',
+          key: Math.random()*10000,
+          cards: [
+            {
+              content: 'Col 2',
+              key: Math.random()*10000,
+            },
+            {
+              content: 'Col 2',
+              key: Math.random()*10000,
+            },
+          ],
+        },
+        {
+          title: 'Thomas',
+          color: '#344759',
+          key: Math.random()*10000,
+          cards: [
+            {
+              content: 'Col 3',
+              key: Math.random()*10000,
+            },
+            {
+              content: 'Col 3',
+              key: Math.random()*10000,
+            },
+          ],
+        },
+        {
+          title: 'George',
+          color: '#E8741E',
+          key: Math.random()*10000,
+          cards: [
+            {
+              content: 'Col 4',
+              key: Math.random()*10000,
+            },
+            {
+              content: 'Col 4',
+              key: Math.random()*10000,
+            },
+          ],
+        },
       ],
     }
   }
 
-  handleNewCard = (title) => {
-    const input = window.prompt('Add a card with new content:', 'Default card');
-    const newCards = this.state[title];
-    newCards.push(input);
-    this.setState({
-      title: newCards,
-    })
-  }
-
-  getNewRightColumn = col => {
-    if (col === 'Winnie') {
-      return 'Bob';
-    } else if (col === 'Bob') {
-      return 'Thomas';
-    } else if (col === 'Thomas') {
-      return 'George';
-    } else {
-      return '';
+  handleNewCard = (replacementIndex) => {
+    const input = window.prompt('Add a card with new content:', '');
+    if (input === null) {
+      return;
     }
+    const newColumn = this.state.columns[replacementIndex];
+    newColumn.cards.push({
+      content: input,
+      key: Math.random()*10000,
+    });
+    const newColumns = [...this.state.columns.slice(0, replacementIndex), newColumn, ...this.state.columns.slice(replacementIndex + 1)]
+    this.setState({
+      columns: newColumns,
+    })
   }
 
-  getNewLeftColumn = col => {
-    if (col === 'George') {
-      return 'Thomas';
-    } else if (col === 'Thomas') {
-      return 'Bob';
-    } else if (col === 'Bob') {
-      return 'Winnie';
-    } else {
-      return '';
+  handleMoveRight = (columnIndex, key) => {
+    if (columnIndex === this.state.columns.length - 1) {
+      return;
     }
+    const oldColumn = this.state.columns[columnIndex];
+    const oldCards = oldColumn.cards;
+    const cardToMove = oldCards.filter(e => e.key === key)[0];
+    const oldColumnNewCards = oldCards.filter(e => e.key !== key);
+    oldColumn.cards = oldColumnNewCards;
+
+    const newColumn = this.state.columns[columnIndex + 1];
+    const newCards = newColumn.cards;
+    newCards.push(cardToMove);
+    newColumn.cards = newCards;
+
+    const newColumns = [...this.state.columns.slice(0, columnIndex), oldColumn, newColumn, ...this.state.columns.slice(columnIndex + 2)];
+
+    this.setState({
+      columns: newColumns,
+    })
+
   }
 
-  handleMoveRight = (column, key) => {
-    const newCol = this.getNewRightColumn(column);
+  handleMoveLeft = (columnIndex, key) => {
+    if (columnIndex === 0) {
+      return;
+    }
+    const oldColumn = this.state.columns[columnIndex];
+    const oldCards = oldColumn.cards;
+    const cardToMove = oldCards.filter(e => e.key === key)[0];
+    const oldColumnNewCards = oldCards.filter(e => e.key !== key);
+    oldColumn.cards = oldColumnNewCards;
+
+    const newColumn = this.state.columns[columnIndex - 1];
+    const newCards = newColumn.cards;
+    newCards.push(cardToMove);
+    newColumn.cards = newCards;
+
+    const newColumns = [...this.state.columns.slice(0, columnIndex - 1), newColumn, oldColumn, ...this.state.columns.slice(columnIndex + 1)];
+
     this.setState({
-
+      columns: newColumns,
     })
-  }
 
-  handleMoveLeft = (column, key) => {
-    const newCol = this.getNewLeftColumn(column);
-    this.setState({
-
-    })
   }
 
   render() {
+    const columns = this.state.columns.map((col, index) => <Column moveLeft={this.handleMoveLeft} moveRight={this.handleMoveRight} add={this.handleNewCard} data={col} index={index} key={col.key} />)
     return (
       <FlexContainer>
-        <Column moveLeft={this.handleMoveLeft} moveRight={this.handleMoveRight} add={this.handleNewCard} cards={this.state.Winnie} title={'Winnie'}/>
-        <Column moveLeft={this.handleMoveLeft} moveRight={this.handleMoveRight} add={this.handleNewCard} cards={this.state.Bob} title={'Bob'}/>
-        <Column moveLeft={this.handleMoveLeft} moveRight={this.handleMoveRight} add={this.handleNewCard} cards={this.state.Thomas} title={'Thomas'}/>
-        <Column moveLeft={this.handleMoveLeft} moveRight={this.handleMoveRight} add={this.handleNewCard} cards={this.state.George} title={'George'}/>
+        {columns}
       </FlexContainer>
     );
   }
